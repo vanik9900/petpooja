@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Smart Kitchen System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Notifications Page Specific Styles */
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .notifications-filters {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-btn:hover {
+            background: #f8f9fa;
+            border-color: #2ecc71;
+        }
+
+        .filter-btn.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+
+        .notifications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .notification-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .notification-card.unread {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .notification-icon.inventory { background: #2ecc71; }
+        .notification-icon.menu { background: #3498db; }
+        .notification-icon.waste { background: #e74c3c; }
+        .notification-icon.settings { background: #f1c40f; }
+        .notification-icon.order { background: #9b59b6; }
+        .notification-icon.system { background: #34495e; }
+
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .notification-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            background: none;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .action-btn:hover {
+            color: #2ecc71;
+        }
+
+        .mark-all-read {
+            padding: 0.5rem 1rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mark-all-read:hover {
+            background: #27ae60;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .notifications-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .notifications-filters {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .filter-btn {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>Smart Kitchen</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="inventory.html"><i class="fas fa-box"></i> Inventory</a></li>
+                <li><a href="predictions.html"><i class="fas fa-chart-bar"></i> Predictions</a></li>
+                <li><a href="menu.html"><i class="fas fa-clipboard-list"></i> Menu</a></li>
+                <li><a href="waste.html"><i class="fas fa-trash"></i> Waste Analysis</a></li>
+                <li><a href="notifications.html" class="active"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="logout-section">
+                <button onclick="handleSignOut()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div class="header-content">
+                    <h1>Notifications</h1>
+                    <div class="user-info">
+                        <span class="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </span>
+                        <span class="user">
+                            <a href="profile.html" class="user-profile-link">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="User">
+                            </a>
+                            <a href="profile.html" class="user-name-link">
+                                <span id="userName">Admin</span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Notifications Content -->
+            <div class="notifications-header">
+                <div class="notifications-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-bell"></i>
+                        All
+                    </button>
+                    <button class="filter-btn" data-filter="inventory">
+                        <i class="fas fa-box"></i>
+                        Inventory
+                    </button>
+                    <button class="filter-btn" data-filter="menu">
+                        <i class="fas fa-utensils"></i>
+                        Menu
+                    </button>
+                    <button class="filter-btn" data-filter="waste">
+                        <i class="fas fa-trash"></i>
+                        Waste
+                    </button>
+                    <button class="filter-btn" data-filter="orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        Orders
+                    </button>
+                    <button class="filter-btn" data-filter="system">
+                        <i class="fas fa-cog"></i>
+                        System
+                    </button>
+                </div>
+                <button class="mark-all-read">
+                    <i class="fas fa-check-double"></i>
+                    Mark All as Read
+                </button>
+            </div>
+
+            <!-- Notifications Grid -->
+            <div class="notifications-grid">
+                <!-- Inventory Notification -->
+                <div class="notification-card unread" data-category="inventory">
+                    <div class="notification-icon inventory">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="notification-title">Low Stock Alert</div>
+                    <div class="notification-message">
+                        Tomatoes are running low in stock. Current quantity: 5 kg. Please restock soon.
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">
+                            <i class="fas fa-clock"></i>
+                            2 minutes ago
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" title="Mark as read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Notification -->
+                <div class="notification-card" data-category="menu">
+                    <div class="notification-icon menu">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="notification-title">Menu Update</div>
+                    <div class="notification-message">
+                        New item "Spicy Chicken Biryani" has been added to the menu.
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">
+                            <i class="fas fa-clock"></i>
+                            15 minutes ago
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" title="Mark as read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waste Notification -->
+                <div class="notification-card unread" data-category="waste">
+                    <div class="notification-icon waste">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                    <div class="notification-title">Waste Report Generated</div>
+                    <div class="notification-message">
+                        Weekly waste report is ready. Total waste cost: ₹2,345
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">
+                            <i class="fas fa-clock"></i>
+                            1 hour ago
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" title="Mark as read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Notification -->
+                <div class="notification-card unread" data-category="orders">
+                    <div class="notification-icon order">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="notification-title">New Order Received</div>
+                    <div class="notification-message">
+                        Order #12345 received. Total amount: ₹1,234
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">
+                            <i class="fas fa-clock"></i>
+                            2 hours ago
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" title="Mark as read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Notification -->
+                <div class="notification-card" data-category="system">
+                    <div class="notification-icon system">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="notification-title">System Update</div>
+                    <div class="notification-message">
+                        System maintenance scheduled for tonight at 2 AM. Service interruption: 30 minutes
+                    </div>
+                    <div class="notification-meta">
+                        <div class="notification-time">
+                            <i class="fas fa-clock"></i>
+                            3 hours ago
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-btn" title="Mark as read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user name
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = userName;
+            }
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.classList.remove('light-theme', 'dark-theme', 'system-theme');
+            document.body.classList.add(`${savedTheme}-theme`);
+
+            // Filter notifications
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const notificationCards = document.querySelectorAll('.notification-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.dataset.filter;
+
+                    // Filter notifications
+                    notificationCards.forEach(card => {
+                        if (filter === 'all' || card.dataset.category === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Mark notification as read
+            notificationCards.forEach(card => {
+                const markReadBtn = card.querySelector('.action-btn:first-child');
+                markReadBtn.addEventListener('click', function() {
+                    card.classList.remove('unread');
+                    updateNotificationCount();
+                });
+            });
+
+            // Delete notification
+            notificationCards.forEach(card => {
+                const deleteBtn = card.querySelector('.action-btn:last-child');
+                deleteBtn.addEventListener('click', function() {
+                    card.remove();
+                    updateNotificationCount();
+                });
+            });
+
+            // Mark all as read
+            const markAllReadBtn = document.querySelector('.mark-all-read');
+            markAllReadBtn.addEventListener('click', function() {
+                notificationCards.forEach(card => {
+                    card.classList.remove('unread');
+                });
+                updateNotificationCount();
+            });
+
+            // Update notification count
+            function updateNotificationCount() {
+                const unreadCount = document.querySelectorAll('.notification-card.unread').length;
+                const badge = document.querySelector('.notifications .badge');
+                badge.textContent = unreadCount;
+            }
+
+            // Initial notification count
+            updateNotificationCount();
+        });
+    </script>
+</body>
+</html> 

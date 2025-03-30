@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictions - Smart Kitchen System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Predictions Page Specific Styles */
+        .predictions-container {
+            padding: 2rem;
+        }
+
+        .predictions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 1rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn.active {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .prediction-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .prediction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .prediction-icon.sales { background: #2ecc71; }
+        .prediction-icon.inventory { background: #3498db; }
+        .prediction-icon.waste { background: #e74c3c; }
+        .prediction-icon.weather { background: #f1c40f; }
+
+        .prediction-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .prediction-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .prediction-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .trend-up { color: #2ecc71; }
+        .trend-down { color: #e74c3c; }
+
+        .chart-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-btn:hover {
+            background: #f8f9fa;
+            border-color: #2ecc71;
+        }
+
+        .chart-btn.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .insights-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background: #2ecc71;
+        }
+
+        .insight-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .insight-content {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .insight-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .insight-list li i {
+            color: #2ecc71;
+        }
+
+        @media (max-width: 768px) {
+            .predictions-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .time-range-selector {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .chart-section {
+                overflow-x: auto;
+            }
+        }
+
+        /* Dark Mode Support */
+        .dark-theme .prediction-card,
+        .dark-theme .chart-section,
+        .dark-theme .insight-card {
+            background: #2d3436;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-theme .prediction-title,
+        .dark-theme .chart-title,
+        .dark-theme .insight-title {
+            color: #fff;
+        }
+
+        .dark-theme .prediction-label,
+        .dark-theme .insight-content,
+        .dark-theme .insight-list li {
+            color: #b2bec3;
+        }
+
+        .dark-theme .time-range-selector {
+            background: #2d3436;
+        }
+
+        .dark-theme .time-btn {
+            color: #b2bec3;
+        }
+
+        .dark-theme .chart-btn {
+            background: #2d3436;
+            border-color: #636e72;
+            color: #b2bec3;
+        }
+
+        .dark-theme .chart-btn:hover {
+            background: #636e72;
+            border-color: #b2bec3;
+        }
+
+        .dark-theme .chart-btn.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>Smart Kitchen</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="inventory.html"><i class="fas fa-box"></i> Inventory</a></li>
+                <li class="active"><a href="predictions.html"><i class="fas fa-chart-bar"></i> Predictions</a></li>
+                <li><a href="menu.html"><i class="fas fa-clipboard-list"></i> Menu</a></li>
+                <li><a href="waste.html"><i class="fas fa-trash"></i> Waste Analysis</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="logout-section">
+                <button onclick="handleSignOut()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div class="header-content">
+                    <h1>Predictions</h1>
+                    <div class="user-info">
+                        <span class="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </span>
+                        <span class="user">
+                            <a href="profile.html" class="user-profile-link">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="User">
+                            </a>
+                            <a href="profile.html" class="user-name-link">
+                                <span id="userName">Admin</span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Predictions Content -->
+            <div class="predictions-container">
+                <div class="predictions-header">
+                    <div class="time-range-selector">
+                        <button class="time-btn active">Today</button>
+                        <button class="time-btn">This Week</button>
+                        <button class="time-btn">This Month</button>
+                        <button class="time-btn">This Year</button>
+                    </div>
+                    <button class="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Predictions
+                    </button>
+                </div>
+
+                <!-- Prediction Cards -->
+                <div class="predictions-grid">
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <h3 class="prediction-title">Sales Forecast</h3>
+                            <div class="prediction-icon sales">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div class="prediction-value">₹45,678</div>
+                        <div class="prediction-label">Expected Revenue</div>
+                        <div class="prediction-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span class="trend-up">12% from last period</span>
+                        </div>
+                    </div>
+
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <h3 class="prediction-title">Inventory Needs</h3>
+                            <div class="prediction-icon inventory">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        <div class="prediction-value">8 Items</div>
+                        <div class="prediction-label">Low Stock Alerts</div>
+                        <div class="prediction-trend">
+                            <i class="fas fa-arrow-down"></i>
+                            <span class="trend-down">5% from last period</span>
+                        </div>
+                    </div>
+
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <h3 class="prediction-title">Waste Prediction</h3>
+                            <div class="prediction-icon waste">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                        </div>
+                        <div class="prediction-value">2.5 kg</div>
+                        <div class="prediction-label">Expected Waste</div>
+                        <div class="prediction-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span class="trend-up">8% from last period</span>
+                        </div>
+                    </div>
+
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <h3 class="prediction-title">Weather Impact</h3>
+                            <div class="prediction-icon weather">
+                                <i class="fas fa-cloud-sun"></i>
+                            </div>
+                        </div>
+                        <div class="prediction-value">+15%</div>
+                        <div class="prediction-label">Expected Customer Increase</div>
+                        <div class="prediction-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span class="trend-up">Due to sunny weather</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Prediction Chart -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Sales Prediction Trend</h3>
+                        <div class="chart-actions">
+                            <button class="chart-btn active">Daily</button>
+                            <button class="chart-btn">Weekly</button>
+                            <button class="chart-btn">Monthly</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesPredictionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="insights-section">
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h3 class="insight-title">Smart Recommendations</h3>
+                        </div>
+                        <div class="insight-content">
+                            <ul class="insight-list">
+                                <li><i class="fas fa-check-circle"></i> Increase stock of popular items by 20%</li>
+                                <li><i class="fas fa-check-circle"></i> Consider running promotions on slow-moving items</li>
+                                <li><i class="fas fa-check-circle"></i> Optimize staff scheduling for peak hours</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h3 class="insight-title">Trend Analysis</h3>
+                        </div>
+                        <div class="insight-content">
+                            <ul class="insight-list">
+                                <li><i class="fas fa-check-circle"></i> Weekend sales expected to increase by 25%</li>
+                                <li><i class="fas fa-check-circle"></i> Peak hours: 12:00 PM - 2:00 PM</li>
+                                <li><i class="fas fa-check-circle"></i> Most popular items: Butter Chicken, Biryani</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="insight-title">Risk Alerts</h3>
+                        </div>
+                        <div class="insight-content">
+                            <ul class="insight-list">
+                                <li><i class="fas fa-check-circle"></i> Potential supply chain delays expected</li>
+                                <li><i class="fas fa-check-circle"></i> Weather may affect customer turnout</li>
+                                <li><i class="fas fa-check-circle"></i> Consider backup suppliers for critical items</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user name
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = userName;
+            }
+
+            // Initialize Sales Prediction Chart
+            const ctx = document.getElementById('salesPredictionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Actual Sales',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Predicted Sales',
+                        data: [15000, 20000, 18000, 28000, 25000, 32000, 30000],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                },
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+
+            // Add event listeners for time range buttons
+            const timeButtons = document.querySelectorAll('.time-btn');
+            timeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    timeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    // Add logic to update predictions based on time range
+                });
+            });
+
+            // Add event listener for refresh button
+            document.querySelector('.refresh-btn').addEventListener('click', function() {
+                this.classList.add('rotating');
+                // Add logic to refresh predictions
+                setTimeout(() => {
+                    this.classList.remove('rotating');
+                }, 1000);
+            });
+
+            // Add event listeners for chart period buttons
+            const chartButtons = document.querySelectorAll('.chart-btn');
+            chartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    chartButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    // Add logic to update chart based on period
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

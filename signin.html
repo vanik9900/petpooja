@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Smart Kitchen System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Sign In Specific Styles */
+        .signin-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .signin-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .signin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .signin-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .signin-logo i {
+            font-size: 2rem;
+            color: #2ecc71;
+        }
+
+        .signin-logo span {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .signin-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .signin-description {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .signin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input {
+            padding: 0.8rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .form-group input.error:focus {
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .form-group input.error + .error-message {
+            display: block;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle i:hover {
+            color: #2c3e50;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .signin-btn {
+            background: #2ecc71;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .signin-btn:hover {
+            background: #27ae60;
+        }
+
+        .signin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .signin-btn i {
+            font-size: 1.2rem;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #2ecc71;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #27ae60;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .signup-link a {
+            color: #2ecc71;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #27ae60;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            background: #2ecc71;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signin-container {
+                padding: 1rem;
+            }
+
+            .signin-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signin-container">
+        <div class="signin-card">
+            <div class="signin-header">
+                <div class="signin-logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Smart Kitchen</span>
+                </div>
+                <h1 class="signin-title">Welcome Back</h1>
+                <p class="signin-description">Sign in to your account to continue</p>
+            </div>
+
+            <form class="signin-form" onsubmit="handleSignIn(event)">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required>
+                    <div class="error-message">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-toggle">
+                        <input type="password" id="password" required>
+                        <i class="fas fa-eye" onclick="togglePassword()"></i>
+                    </div>
+                    <div class="error-message">Password must be at least 8 characters long</div>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+
+                <button type="submit" class="signin-btn" id="signinBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+
+                <div class="forgot-password">
+                    <a href="#" onclick="handleForgotPassword()">Forgot your password?</a>
+                </div>
+
+                <div class="signup-link">
+                    Don't have an account? <a href="#" onclick="location.href='signup.html'">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Function to validate email
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        // Function to validate password
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+
+        // Function to show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Function to handle sign in
+        async function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const signinBtn = document.getElementById('signinBtn');
+
+            // Reset error states
+            document.getElementById('email').classList.remove('error');
+            document.getElementById('password').classList.remove('error');
+
+            // Validate email
+            if (!validateEmail(email)) {
+                document.getElementById('email').classList.add('error');
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Validate password
+            if (!validatePassword(password)) {
+                document.getElementById('password').classList.add('error');
+                showNotification('Password must be at least 8 characters long', 'error');
+                return;
+            }
+
+            // Disable sign in button
+            signinBtn.disabled = true;
+            signinBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+            try {
+                // Get stored users
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // Find user with matching email and password
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    // Create a simple token (in a real app, this would be more secure)
+                    const token = btoa(email + ':' + new Date().getTime());
+                    
+                    // Store user data
+                    localStorage.setItem('userName', user.name);
+                    localStorage.setItem('token', token);
+                    if (remember) {
+                        localStorage.setItem('rememberMe', 'true');
+                    }
+
+                    showNotification('Successfully signed in!', 'success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    throw new Error('Invalid email or password');
+                }
+            } catch (error) {
+                showNotification(error.message, 'error');
+            } finally {
+                // Re-enable sign in button
+                signinBtn.disabled = false;
+                signinBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            }
+        }
+
+        // Function to handle forgot password
+        function handleForgotPassword() {
+            // Implement forgot password functionality
+            showNotification('Forgot password feature coming soon!', 'info');
+        }
+
+        // Check if user is already signed in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html> 

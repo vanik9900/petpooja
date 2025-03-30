@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - Smart Kitchen System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-settings-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-picture-section {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .change-photo-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #2ecc71;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .change-photo-btn:hover {
+            transform: scale(1.1);
+            background: #27ae60;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-role {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .settings-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .card-icon.personal { background: #2ecc71; }
+        .card-icon.security { background: #3498db; }
+        .card-icon.preferences { background: #f1c40f; }
+        .card-icon.notifications { background: #e74c3c; }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2ecc71;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #2ecc71;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .save-btn {
+            background: #2ecc71;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .save-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .settings-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main class="main-content">
+            <div class="profile-settings-container">
+                <div class="settings-header">
+                    <div class="profile-picture-section">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Profile Picture" id="profilePicture" class="profile-picture">
+                        <label class="change-photo-btn">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" accept="image/*" style="display: none;" id="profilePictureInput">
+                        </label>
+                    </div>
+                    <div class="profile-info">
+                        <h1 class="profile-name" id="profileName">Loading...</h1>
+                        <p class="profile-role" id="profileRole">Restaurant Manager</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">156</div>
+                                <div class="stat-label">Orders</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">₹45,678</div>
+                                <div class="stat-label">Revenue</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">4.8</div>
+                                <div class="stat-label">Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Personal Information -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon personal">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h2 class="card-title">Personal Information</h2>
+                        </div>
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Role <span class="required">*</span></label>
+                            <select id="role" required>
+                                <option value="">Select Role</option>
+                                <option value="Restaurant Manager">Restaurant Manager</option>
+                                <option value="Kitchen Staff">Kitchen Staff</option>
+                                <option value="Server">Server</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Security Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon security">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h2 class="card-title">Security Settings</h2>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword">
+                        </div>
+                        <div class="form-group toggle-group">
+                            <label>Two-Factor Authentication</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="twoFactor">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon preferences">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <h2 class="card-title">Preferences</h2>
+                        </div>
+                        <div class="form-group">
+                            <label>Preferred Language <span class="required">*</span></label>
+                            <select id="language" required>
+                                <option value="en">English</option>
+                                <option value="hi">Hindi</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Time Zone <span class="required">*</span></label>
+                            <select id="timezone" required>
+                                <option value="IST">India Standard Time (IST)</option>
+                                <option value="UTC">UTC</option>
+                                <option value="PST">Pacific Standard Time (PST)</option>
+                                <option value="EST">Eastern Standard Time (EST)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Theme <span class="required">*</span></label>
+                            <select id="theme" required>
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="system">System</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon notifications">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h2 class="card-title">Notification Settings</h2>
+                        </div>
+                        <div class="form-group toggle-group">
+                            <label>Email Notifications</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        <div class="form-group toggle-group">
+                            <label>SMS Notifications</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="smsNotifications">
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        <div class="form-group toggle-group">
+                            <label>Push Notifications</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="pushNotifications" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick="saveSettings()">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+        });
+
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('userData')) || {};
+            const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
+            const signUpData = JSON.parse(localStorage.getItem('signUpData')) || {};
+
+            // Update profile information
+            document.getElementById('profileName').textContent = currentUser.name || signUpData.name || 'Not Set';
+            document.getElementById('profileRole').textContent = userData.role || 'Restaurant Manager';
+
+            // Populate form fields
+            document.getElementById('fullName').value = currentUser.name || signUpData.name || '';
+            document.getElementById('email').value = currentUser.email || signUpData.email || '';
+            document.getElementById('phone').value = userData.phone || signUpData.phone || '';
+            document.getElementById('role').value = userData.role || '';
+            document.getElementById('language').value = userData.language || 'en';
+            document.getElementById('timezone').value = userData.timezone || 'IST';
+            document.getElementById('theme').value = userData.theme || 'light';
+            document.getElementById('twoFactor').checked = userData.twoFactor || false;
+            document.getElementById('emailNotifications').checked = userData.emailNotifications !== false;
+            document.getElementById('smsNotifications').checked = userData.smsNotifications || false;
+            document.getElementById('pushNotifications').checked = userData.pushNotifications !== false;
+
+            // Load saved profile picture
+            const savedPicture = localStorage.getItem('profilePicture');
+            if (savedPicture) {
+                document.getElementById('profilePicture').src = savedPicture;
+            }
+        }
+
+        // Handle profile picture upload
+        document.getElementById('profilePictureInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePicture').src = e.target.result;
+                    localStorage.setItem('profilePicture', e.target.result);
+                    showNotification('Profile picture updated successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function saveSettings() {
+            const formData = {
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                role: document.getElementById('role').value,
+                language: document.getElementById('language').value,
+                timezone: document.getElementById('timezone').value,
+                theme: document.getElementById('theme').value,
+                twoFactor: document.getElementById('twoFactor').checked,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                smsNotifications: document.getElementById('smsNotifications').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked
+            };
+
+            // Update localStorage
+            localStorage.setItem('userData', JSON.stringify(formData));
+            localStorage.setItem('currentUser', JSON.stringify({
+                name: formData.name,
+                email: formData.email
+            }));
+
+            // Handle password change if provided
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (currentPassword && newPassword && confirmPassword) {
+                if (newPassword === confirmPassword) {
+                    // Update password in localStorage
+                    const users = JSON.parse(localStorage.getItem('users') || '[]');
+                    const userIndex = users.findIndex(u => u.email === formData.email);
+                    if (userIndex !== -1) {
+                        users[userIndex].password = newPassword;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                } else {
+                    showNotification('New passwords do not match!', 'error');
+                    return;
+                }
+            }
+
+            // Clear password fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            // Show success message
+            showNotification('Settings saved successfully!', 'success');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 

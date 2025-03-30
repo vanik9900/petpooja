@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PetPoojja</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --text-color: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --card-bg: #ffffff;
+            --border-color: #e1e1e1;
+            --sidebar-bg: #f8f9fa;
+            --sidebar-hover: #e9ecef;
+            --sidebar-active: #e3f2fd;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --text-color: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --card-bg: #2c3e50;
+            --border-color: #34495e;
+            --sidebar-bg: #1a252f;
+            --sidebar-hover: #2c3e50;
+            --sidebar-active: #34495e;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: var(--text-color);
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .nav-item.active {
+            background: var(--sidebar-active);
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background: #f5f6fa;
+        }
+
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .date-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .date-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .date-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .refresh-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1);
+        }
+
+        .stat-icon.primary { background: linear-gradient(45deg, #2ecc71, #27ae60); }
+        .stat-icon.warning { background: linear-gradient(45deg, #f1c40f, #f39c12); }
+        .stat-icon.danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .stat-icon.info { background: linear-gradient(45deg, #3498db, #2980b9); }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        .trend-up { color: #2ecc71; }
+        .trend-down { color: #e74c3c; }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chart-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .chart-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .chart-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .activity-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem;
+            background: rgba(46, 204, 113, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .activity-icon.inventory { background: linear-gradient(45deg, #2ecc71, #27ae60); }
+        .activity-icon.menu { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .activity-icon.waste { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .activity-icon.settings { background: linear-gradient(45deg, #f1c40f, #f39c12); }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover .action-icon {
+            transform: scale(1.1);
+        }
+
+        .action-icon.primary { background: linear-gradient(45deg, #2ecc71, #27ae60); }
+        .action-icon.info { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .action-icon.danger { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .action-icon.warning { background: linear-gradient(45deg, #f1c40f, #f39c12); }
+
+        .action-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .date-range {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Add rotation animation for refresh button */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .rotating {
+            animation: rotate 1s linear infinite;
+        }
+
+        /* Settings Section Styles */
+        .settings-section {
+            margin-top: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .settings-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .settings-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-item label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 1rem;
+            width: 200px;
+        }
+
+        .settings-item input[type="text"]:focus,
+        .settings-item select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .save-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        /* Switch Toggle Styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .settings-item input[type="text"],
+            .settings-item select {
+                width: 100%;
+            }
+        }
+
+        /* Add Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--card-bg);
+            margin: 2rem auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+            transform: rotate(90deg);
+        }
+
+        .function-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .function-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .function-tab:hover {
+            background: var(--sidebar-hover);
+        }
+
+        .function-tab.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .function-content {
+            display: none;
+        }
+
+        .function-content.active {
+            display: block;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .inventory-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .inventory-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .inventory-info {
+            flex: 1;
+        }
+
+        .inventory-name {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .inventory-stock {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stock-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stock-status.low {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .stock-status.medium {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .stock-status.high {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .prediction-chart {
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .waste-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .waste-stat {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .waste-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .waste-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .waste-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .action-button.secondary {
+            background: var(--sidebar-hover);
+            color: var(--text-color);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="PetPoojja Logo" class="logo">
+                <h1>PetPoojja</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" id="menuBtn">
+                    <i class="fas fa-utensils"></i>
+                    <span>Menu</span>
+                </a>
+                <a href="#" class="nav-item" id="inventoryBtn">
+                    <i class="fas fa-box"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="#" class="nav-item" id="predictionsBtn">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Predictions</span>
+                </a>
+                <a href="#" class="nav-item" id="wasteBtn">
+                    <i class="fas fa-trash"></i>
+                    <span>Waste Analysis</span>
+                </a>
+                <a href="#" class="nav-item" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="avatar.png" alt="User Avatar" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name">John Doe</span>
+                        <span class="user-role">Admin</span>
+                    </div>
+                </div>
+                <button class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <div>
+                        <h1 class="dashboard-title">Dashboard</h1>
+                        <p class="dashboard-subtitle">Welcome back! Here's what's happening with your restaurant today.</p>
+                    </div>
+                    <div class="date-range">
+                        <button class="date-btn active">Today</button>
+                        <button class="date-btn">This Week</button>
+                        <button class="date-btn">This Month</button>
+                        <button class="date-btn">This Year</button>
+                    </div>
+                    <button class="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Data
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon primary">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <span class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                12%
+                            </span>
+                        </div>
+                        <div class="stat-value">₹45,678</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <span class="stat-trend trend-down">
+                                <i class="fas fa-arrow-down"></i>
+                                5%
+                            </span>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Low Stock Items</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon danger">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <span class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                8%
+                            </span>
+                        </div>
+                        <div class="stat-value">₹2,345</div>
+                        <div class="stat-label">Waste Cost</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i>
+                                15%
+                            </span>
+                        </div>
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Revenue Overview</h3>
+                            <div class="chart-actions">
+                                <button class="chart-btn active">Daily</button>
+                                <button class="chart-btn">Weekly</button>
+                                <button class="chart-btn">Monthly</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="activity-card">
+                        <h3 class="activity-title">Recent Activity</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon inventory">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">New inventory items added</div>
+                                    <div class="activity-time">2 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon menu">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">Menu updated with new items</div>
+                                    <div class="activity-time">15 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon waste">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">Waste report generated</div>
+                                    <div class="activity-time">1 hour ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon settings">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <div class="activity-title">System settings updated</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="inventory.html" class="action-card">
+                        <div class="action-icon primary">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="action-title">Manage Inventory</div>
+                        <div class="action-description">Add, edit, or remove inventory items and track stock levels</div>
+                    </a>
+                    <a href="menu.html" class="action-card">
+                        <div class="action-icon info">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="action-title">Update Menu</div>
+                        <div class="action-description">Modify menu items, prices, and categories</div>
+                    </a>
+                    <a href="waste.html" class="action-card">
+                        <div class="action-icon danger">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                        <div class="action-title">Track Waste</div>
+                        <div class="action-description">Monitor and analyze waste data to optimize operations</div>
+                    </a>
+                    <a href="predictions.html" class="action-card">
+                        <div class="action-icon warning">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="action-title">View Predictions</div>
+                        <div class="action-description">Check sales and waste predictions for better planning</div>
+                    </a>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">System Settings</h2>
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <div class="settings-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <h3>User Management</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="settings-item">
+                                    <label>User Name</label>
+                                    <input type="text" id="userName" placeholder="Enter your name">
+                                </div>
+                                <div class="settings-item">
+                                    <label>Role</label>
+                                    <select id="userRole">
+                                        <option value="admin">Admin</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="staff">Staff</option>
+                                    </select>
+                                </div>
+                                <button class="save-btn">Save Changes</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h3>Notifications</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="settings-item">
+                                    <label>Low Stock Alerts</label>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Order Notifications</label>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Waste Reports</label>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <h3>Display Settings</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="settings-item">
+                                    <label>Chart Type</label>
+                                    <select id="chartType">
+                                        <option value="bar">Bar Chart</option>
+                                        <option value="line">Line Chart</option>
+                                        <option value="pie">Pie Chart</option>
+                                    </select>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Default Time Range</label>
+                                    <select id="timeRange">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <button class="save-btn">Apply Changes</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-header">
+                                <div class="settings-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <h3>Data Management</h3>
+                            </div>
+                            <div class="settings-content">
+                                <div class="settings-item">
+                                    <label>Auto Backup</label>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="settings-item">
+                                    <label>Backup Frequency</label>
+                                    <select id="backupFrequency">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <button class="save-btn">Backup Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">System Functions</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="function-tabs">
+                <button class="function-tab active" data-tab="inventory">Inventory</button>
+                <button class="function-tab" data-tab="predictions">Predictions</button>
+                <button class="function-tab" data-tab="waste">Waste Analysis</button>
+                <button class="function-tab" data-tab="settings">Settings</button>
+            </div>
+
+            <!-- Inventory Content -->
+            <div class="function-content active" id="inventory-content">
+                <div class="inventory-grid">
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Rice</div>
+                            <div class="inventory-stock">Current Stock: 25 kg</div>
+                            <span class="stock-status medium">Medium Stock</span>
+                        </div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Vegetables</div>
+                            <div class="inventory-stock">Current Stock: 10 kg</div>
+                            <span class="stock-status low">Low Stock</span>
+                        </div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Spices</div>
+                            <div class="inventory-stock">Current Stock: 50 kg</div>
+                            <span class="stock-status high">High Stock</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-button primary">
+                        <i class="fas fa-plus"></i>
+                        Add New Item
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-file-export"></i>
+                        Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Predictions Content -->
+            <div class="function-content" id="predictions-content">
+                <div class="prediction-chart">
+                    <canvas id="predictionChart"></canvas>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-button primary">
+                        <i class="fas fa-sync"></i>
+                        Update Predictions
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Waste Analysis Content -->
+            <div class="function-content" id="waste-content">
+                <div class="waste-stats">
+                    <div class="waste-stat">
+                        <div class="waste-value">₹2,345</div>
+                        <div class="waste-label">Total Waste Cost</div>
+                        <div class="waste-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            8% from last month
+                        </div>
+                    </div>
+                    <div class="waste-stat">
+                        <div class="waste-value">150 kg</div>
+                        <div class="waste-label">Total Waste</div>
+                        <div class="waste-trend trend-down">
+                            <i class="fas fa-arrow-down"></i>
+                            5% from last month
+                        </div>
+                    </div>
+                    <div class="waste-stat">
+                        <div class="waste-value">12</div>
+                        <div class="waste-label">Waste Categories</div>
+                        <div class="waste-trend">
+                            <i class="fas fa-chart-pie"></i>
+                            View Breakdown
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-button primary">
+                        <i class="fas fa-chart-bar"></i>
+                        Generate Report
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-cog"></i>
+                        Configure Alerts
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Content -->
+            <div class="function-content" id="settings-content">
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <h3>User Management</h3>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-item">
+                                <label>User Name</label>
+                                <input type="text" id="userName" placeholder="Enter your name">
+                            </div>
+                            <div class="settings-item">
+                                <label>Role</label>
+                                <select id="userRole">
+                                    <option value="admin">Admin</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="staff">Staff</option>
+                                </select>
+                            </div>
+                            <button class="save-btn">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h3>Notifications</h3>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-item">
+                                <label>Low Stock Alerts</label>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-item">
+                                <label>Order Notifications</label>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-item">
+                                <label>Waste Reports</label>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <h3>Display Settings</h3>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-item">
+                                <label>Chart Type</label>
+                                <select id="chartType">
+                                    <option value="bar">Bar Chart</option>
+                                    <option value="line">Line Chart</option>
+                                    <option value="pie">Pie Chart</option>
+                                </select>
+                            </div>
+                            <div class="settings-item">
+                                <label>Default Time Range</label>
+                                <select id="timeRange">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <button class="save-btn">Apply Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3>Data Management</h3>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-item">
+                                <label>Auto Backup</label>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="settings-item">
+                                <label>Backup Frequency</label>
+                                <select id="backupFrequency">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <button class="save-btn">Backup Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle functionality
+            const themeToggle = document.querySelector('.theme-toggle');
+            const icon = themeToggle.querySelector('i');
+            
+            function setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            });
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+
+            // Load user name
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.querySelector('.user-name').textContent = userName;
+            }
+
+            // Initialize Revenue Chart
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            let revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000, 28000],
+                        backgroundColor: [
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)',
+                            'rgba(46, 204, 113, 0.8)'
+                        ],
+                        borderRadius: 8,
+                        maxBarThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                },
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+
+            // Function to load revenue data
+            async function loadRevenueData(period) {
+                try {
+                    const response = await fetch(`/api/revenue?period=${period}`);
+                    const data = await response.json();
+                    
+                    // Update chart data
+                    revenueChart.data.labels = data.labels;
+                    revenueChart.data.datasets[0].data = data.values;
+                    revenueChart.update();
+                } catch (error) {
+                    console.error('Error loading revenue data:', error);
+                    showNotification('Failed to load revenue data', 'error');
+                }
+            }
+
+            // Add event listeners for chart period buttons
+            const chartButtons = document.querySelectorAll('.chart-btn');
+            chartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    chartButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const period = this.textContent.toLowerCase();
+                    loadRevenueData(period);
+                });
+            });
+
+            // Add event listeners for date range buttons
+            const dateButtons = document.querySelectorAll('.date-btn');
+            dateButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    dateButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const period = this.textContent.toLowerCase().replace(' ', '-');
+                    loadRevenueData(period);
+                });
+            });
+
+            // Add event listener for refresh button
+            document.querySelector('.refresh-btn').addEventListener('click', function() {
+                this.classList.add('rotating');
+                const activePeriod = document.querySelector('.chart-btn.active').textContent.toLowerCase();
+                loadRevenueData(activePeriod);
+                setTimeout(() => {
+                    this.classList.remove('rotating');
+                }, 1000);
+            });
+
+            // Initial data load
+            loadRevenueData('daily');
+
+            // Settings functionality
+            const userNameInput = document.getElementById('userName');
+            const userRoleSelect = document.getElementById('userRole');
+            const chartTypeSelect = document.getElementById('chartType');
+            const timeRangeSelect = document.getElementById('timeRange');
+            const backupFrequencySelect = document.getElementById('backupFrequency');
+
+            // Load saved settings
+            function loadSettings() {
+                userNameInput.value = localStorage.getItem('userName') || '';
+                userRoleSelect.value = localStorage.getItem('userRole') || 'admin';
+                chartTypeSelect.value = localStorage.getItem('chartType') || 'bar';
+                timeRangeSelect.value = localStorage.getItem('timeRange') || 'daily';
+                backupFrequencySelect.value = localStorage.getItem('backupFrequency') || 'daily';
+            }
+
+            // Save settings
+            function saveSettings() {
+                localStorage.setItem('userName', userNameInput.value);
+                localStorage.setItem('userRole', userRoleSelect.value);
+                localStorage.setItem('chartType', chartTypeSelect.value);
+                localStorage.setItem('timeRange', timeRangeSelect.value);
+                localStorage.setItem('backupFrequency', backupFrequencySelect.value);
+                
+                // Update chart type if changed
+                if (chartTypeSelect.value !== revenueChart.config.type) {
+                    revenueChart.config.type = chartTypeSelect.value;
+                    revenueChart.update();
+                }
+            }
+
+            // Add event listeners for settings
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', saveSettings);
+            });
+
+            // Load settings on page load
+            loadSettings();
+
+            // Modal functionality
+            const modal = document.getElementById('settingsModal');
+            const menuBtn = document.getElementById('menuBtn');
+            const inventoryBtn = document.getElementById('inventoryBtn');
+            const predictionsBtn = document.getElementById('predictionsBtn');
+            const wasteBtn = document.getElementById('wasteBtn');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const closeModal = document.querySelector('.close-modal');
+            const functionTabs = document.querySelectorAll('.function-tab');
+            const functionContents = document.querySelectorAll('.function-content');
+
+            // Function to show modal and set active tab
+            function showModalWithTab(tabId) {
+                modal.style.display = 'block';
+                functionTabs.forEach(tab => {
+                    if (tab.getAttribute('data-tab') === tabId) {
+                        tab.click();
+                    }
+                });
+            }
+
+            // Event listeners for navigation buttons
+            menuBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModalWithTab('menu');
+            });
+
+            inventoryBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModalWithTab('inventory');
+            });
+
+            predictionsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModalWithTab('predictions');
+            });
+
+            wasteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModalWithTab('waste');
+            });
+
+            settingsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showModalWithTab('settings');
+            });
+
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            functionTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and contents
+                    functionTabs.forEach(t => t.classList.remove('active'));
+                    functionContents.forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    const contentId = this.getAttribute('data-tab') + '-content';
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+
+            // Add Menu Content
+            const menuContent = document.createElement('div');
+            menuContent.className = 'function-content';
+            menuContent.id = 'menu-content';
+            menuContent.innerHTML = `
+                <div class="inventory-grid">
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Main Course</div>
+                            <div class="inventory-stock">15 Items</div>
+                            <span class="stock-status high">Active</span>
+                        </div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Appetizers</div>
+                            <div class="inventory-stock">8 Items</div>
+                            <span class="stock-status high">Active</span>
+                        </div>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="inventory-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="inventory-info">
+                            <div class="inventory-name">Desserts</div>
+                            <div class="inventory-stock">12 Items</div>
+                            <span class="stock-status high">Active</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-button primary">
+                        <i class="fas fa-plus"></i>
+                        Add New Item
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-file-export"></i>
+                        Export Menu
+                    </button>
+                </div>
+            `;
+
+            // Insert menu content after the first function content
+            const firstContent = document.querySelector('.function-content');
+            firstContent.parentNode.insertBefore(menuContent, firstContent.nextSibling);
+
+            // Add Menu tab
+            const menuTab = document.createElement('button');
+            menuTab.className = 'function-tab';
+            menuTab.setAttribute('data-tab', 'menu');
+            menuTab.textContent = 'Menu';
+            document.querySelector('.function-tabs').appendChild(menuTab);
+
+            // Initialize Prediction Chart
+            const predictionCtx = document.getElementById('predictionChart').getContext('2d');
+            new Chart(predictionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Predicted Revenue',
+                        data: [45000, 52000, 48000, 58000, 55000, 62000],
+                        borderColor: '#2ecc71',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                drawBorder: false,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                },
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
